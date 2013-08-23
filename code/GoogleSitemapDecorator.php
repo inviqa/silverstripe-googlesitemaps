@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Decorate the page object to provide google sitemaps with 
+ * Decorate the page object to provide google sitemaps with
  * additionally options and configuration.
- * 
+ *
  * @package googlesitemaps
  */
 class GoogleSitemapDecorator extends DataExtension {
-    
+
 }
 
 /**
@@ -18,7 +18,8 @@ class GoogleSitemapSiteTreeDecorator extends DataExtension {
 	/**
 	 * @var array
 	 */
-	public static $db = array(
+//	public static $db = array(
+	private static $db = array(
 		"Priority" => "Varchar(5)"
 	);
 
@@ -42,13 +43,13 @@ class GoogleSitemapSiteTreeDecorator extends DataExtension {
 		);
 
 		$tabset = $fields->findOrMakeTab('Root.Settings');
-		
+
 		$message = "<p>";
-		$message .= sprintf(_t('SiteTree.METANOTEPRIORITY', "Manually specify a Google Sitemaps priority for this page (%s)"), 
+		$message .= sprintf(_t('SiteTree.METANOTEPRIORITY', "Manually specify a Google Sitemaps priority for this page (%s)"),
 			'<a href="http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=71936#prioritize" target="_blank">?</a>'
 		);
 		$message .=  "</p>";
-		
+
 		$tabset->push(new Tab('GoogleSitemap', _t('SiteTree.TABGOOGLESITEMAP', 'Google Sitemap'),
 			new LiteralField("GoogleSitemapIntro", $message),
 			new DropdownField("Priority", $this->owner->fieldLabel('Priority'), $prorities)
@@ -85,24 +86,24 @@ class GoogleSitemapSiteTreeDecorator extends DataExtension {
 		if(!$this->owner->getField('Priority')) {
 			$parentStack = $this->owner->parentStack();
 			$numParents = is_array($parentStack) ? count($parentStack) - 1 : 0;
-			
+
 			return max(0.1, 1.0 - ($numParents / 10));
-		} 
+		}
 		elseif ($this->owner->getField('Priority') == -1) {
 			return 0;
-		} 
+		}
 		else {
 			$priority = abs($this->owner->getField('Priority'));
-			
+
 			return (is_float($priority) && $priority <= 1.0) ? $priority : 0.5;
 		}
 	}
 
 	/**
-	 * Returns a pages change frequency calculated by pages age and number of 
-	 * versions. Google expects always, hourly, daily, weekly, monthly, yearly 
+	 * Returns a pages change frequency calculated by pages age and number of
+	 * versions. Google expects always, hourly, daily, weekly, monthly, yearly
 	 * or never as values.
-	 * 
+	 *
 	 * @see http://support.google.com/webmasters/bin/answer.py?hl=en&answer=183668&topic=8476&ctx=topic
 	 *
 	 * @return void
@@ -116,7 +117,7 @@ class GoogleSitemapSiteTreeDecorator extends DataExtension {
 
 		$now = new SS_Datetime();
 		$now->value = $date;
-		
+
 		$versions = (isset($prop['Version'])) ? $prop['Version'] : 1;
 		$timediff = $now->format('U') - $created->format('U');
 
